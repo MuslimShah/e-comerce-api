@@ -1,6 +1,6 @@
 
-	<h1>Express Starter Template with MVC Pattern</h1>
-	<p>This is an Express starter template that implements the Model-View-Controller (MVC) pattern. It includes models, views, controllers, and custom error handlers to help you get started with building your web application quickly and easily.</p>
+<h1>Express Starter Template with MVC Pattern</h1>
+<p>This is an Express starter template that implements the Model-View-Controller (MVC) pattern. It includes models, views, controllers, and custom error handlers to help you get started with building your web application quickly and easily.</p>
   <h2>Installation</h2>
 <p>To use this template, you can clone this repository using Git:</p>
 <pre><code>git clone https://github.com/muslimshah/express-starter-template.git</code></pre>
