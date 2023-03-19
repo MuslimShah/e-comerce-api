@@ -5,7 +5,7 @@
  <h3>Install through npm</h3>
  <pre><code>npm i express-blueprint</code></pre>
 <p>To use this template, you can clone this repository using Git:</p>
-<pre><code>git clone https://github.com/muslimshah/express-starter-template.git</code></pre>
+<pre><code>git clone https://github.com/MuslimShah/express-blueprint.git</code></pre>
 <p>After cloning the repository, navigate to the project directory and install the dependencies using npm:</p>
 <pre><code>cd express-starter-template npm install</code></pre>
 <h2>Usage</h2>
