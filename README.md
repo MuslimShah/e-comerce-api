@@ -2,7 +2,7 @@
 <h1>Express Starter Template with MVC Pattern</h1>
 <p>This is an Express starter template that implements the Model-View-Controller (MVC) pattern. It includes models, views, controllers, and custom error handlers to help you get started with building your web application quickly and easily.</p>
 <p>To use this template, you can clone this repository using Git:</p>
-<pre><code>git clone https://github.com/MuslimShah/express-blueprint.git</code></pre>
+<pre><code>git clone https://github.com/MuslimShah/express-stater-template.git</code></pre>
 <p>After cloning the repository, navigate to the project directory and install the dependencies using npm:</p>
 <pre><code>cd express-starter-template npm install</code></pre>
 <h2>Usage</h2>
