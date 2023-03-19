@@ -2,7 +2,7 @@ require('express-async-errors');
 require('dotenv');
 const express = require('express');
 const adminRoutes = require('./routes/admin')
-const pageNotFound = require('./utils/pageNotFound');
+const pageNotFound = require('./utils/page-not-found');
 const errorHandler = require('./utils/error-handler');
 const app = express();
 const PORT = process.env.PORT || 3000;
