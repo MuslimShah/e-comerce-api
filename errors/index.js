@@ -1,6 +1,5 @@
 //import all custom errors here
-
-const CustomAPIError = require('./customApiError');
+const CustomAPIError = require('./CustomAPIError');
 const BadRequest = require('./BadRequest');
 
 module.exports = {
