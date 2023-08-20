@@ -20,7 +20,7 @@ Happy coding!
 
 
 require('express-async-errors');
-require('dotenv');
+require('dotenv').config();
 const express = require('express');
 const adminRoutes = require('./routes/admin')
 const pageNotFound = require('./utils/page-not-found');
