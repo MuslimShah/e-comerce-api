@@ -5,16 +5,18 @@ const adminRoutes = require('./routes/admin')
 const pageNotFound = require('./utils/page-not-found');
 const errorHandler = require('./utils/error-handler');
 const connectDb=require('./database/database');
+
+//morgan package ==> a middleware to know what route you are hitting
+const morgan=require('morgan')
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'views');
+app.use(express.json());
+//use morgan to print req status and route info --> for debugging
+app.use(morgan('tiny'));
 
-app.use((req,res,next)=>{
-    console.log(req.url);
-    req.next()
-   
-})
+
 app.use('/api/v1/',adminRoutes);
 
 //page not found middleware
