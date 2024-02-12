@@ -1,33 +1,22 @@
 {
-    "name": "express-blueprint",
-    "version": "1.0.0",
-    "description": "express starter template",
-    "main": "app.js",
-    "dependencies": {
-        "dotenv": "^16.0.3",
-        "ejs": "^3.1.8",
-        "express": "^4.18.2",
-        "express-async-errors": "^3.1.1",
-        "http-status-codes": "^2.2.0",
-        "mongoose": "^8.1.1",
-        "morgan": "^1.10.0",
-        "validator": "^13.11.0"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node app.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/muslimshah/express-starter-template.git"
-    },
-    "keywords": [
-        "express-starter-template"
-    ],
-    "author": "Muslim Shah",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/muslimshah/express-starter-template/issues"
-    },
-    "homepage": "https://github.com/muslimshah/express-starter-template#readme"
+  "name": "e-comerce-api",
+  "version": "1.0.0",
+  "description": "ecomerce api followed from a udemy course",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.2",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "http-status-codes": "^2.3.0",
+    "i": "^0.3.7",
+    "mongoose": "^8.1.2",
+    "morgan": "^1.10.0"
+  }
 }

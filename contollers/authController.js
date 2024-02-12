@@ -2,27 +2,31 @@ const User=require('../models/user');
 const {BadRequest,CustomAPIError,unAuthenticatedError}=require('../errors');
 const statusCode=require('http-status-codes')
 
+
+///-------------------------- REGISTER USER ------------------------------------
 exports.register=async (req,res)=>{
-    const user={
-        name:req.body.name,
-        email:req.body.email,
-        password:req.body.password,
-        role:req.body.role
-    };
+    let {name,email,password,role}=req.body;
     //checking for existing user
-    const exUser= await User.find({email:user.email});
+    const exUser= await User.findOne({email});
     if(exUser){
+        //if user already exist throw error with message
         throw new BadRequest('User Already exists with this email');
     }
-    const addedUser= await User.create(user);
-    res.status(statusCode.CREATED).json({msg:'user created',addedUser});
-
-
+    const isFirstAccount= (await User.countDocuments({})===0);
+    //first user will be an admin
+    role =isFirstAccount? 'admin':'user';
+    //add new user 
+    const user= await User.create({name,email,password,role});
+    res.status(statusCode.CREATED).json({msg:'user created',user});
 }
+
+///---------------------- LOGIN USER ---------------------------------------------
 exports.login=(req,res)=>{
     res.send('login route')
     
 }
+
+///----------------------- LOGOUT USER ------------------------------------------ 
 exports.logOut=(req,res)=>{
     res.send('logout route')    
 }

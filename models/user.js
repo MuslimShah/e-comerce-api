@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+const bcrypt=require('bcryptjs');
 //user schema for storing user info
 const userSchema=new mongoose.Schema({
     name:{
@@ -26,5 +27,17 @@ const userSchema=new mongoose.Schema({
     }
 
 });
+//hashing password before saving in db
+userSchema.pre('save',async function(next){
+    const salt= await bcrypt.genSalt(10);
+    this.password=await bcrypt.hash(this.password,salt);
+    next()
+});
+
+//comparing user pssword password with its alternative hashed -->stored in db
+userSchema.methods.comparePassword=async function(candidatePassword){
+    const isMatched=await bcrypt.compare(candidatePassword,this.password);
+    return isMatched;
+}
 
 module.exports=mongoose.model('User',userSchema);
