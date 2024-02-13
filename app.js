@@ -14,15 +14,20 @@ const connectDb = require("./database/database");
 
 //morgan package ==> a middleware to know what route you are hitting
 const morgan = require("morgan");
+const cookieParser=require('cookie-parser')
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "views");
 app.use(express.json());
+app.use(cookieParser());
 //use morgan to print req status and route info --> for debugging
 app.use(morgan("tiny"));
 
+//routes setup
 app.use("/api/v1/auth", authRoutes);
+
+
 
 
 //page not found middleware
