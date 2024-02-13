@@ -17,7 +17,9 @@ exports.register=async (req,res)=>{
     role =isFirstAccount? 'admin':'user';
     //add new user 
     const user= await User.create({name,email,password,role});
-    res.status(statusCode.CREATED).json({msg:'user created',user});
+    //create token
+    const token=await user.createToken();
+    res.status(statusCode.CREATED).json({userId:user._id,name:user.name,role:role,token});
 }
 
 ///---------------------- LOGIN USER ---------------------------------------------

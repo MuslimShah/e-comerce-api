@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
 const bcrypt=require('bcryptjs');
+const jwt=require('jsonwebtoken')
 //user schema for storing user info
 const userSchema=new mongoose.Schema({
     name:{
@@ -34,10 +35,24 @@ userSchema.pre('save',async function(next){
     next()
 });
 
+
 //comparing user pssword password with its alternative hashed -->stored in db
 userSchema.methods.comparePassword=async function(candidatePassword){
     const isMatched=await bcrypt.compare(candidatePassword,this.password);
     return isMatched;
+}
+
+//creating token
+userSchema.methods.createToken=async function(){
+    const secretKey=process.env.JWT_SECRET;
+    const lifeTime=process.env.JWT_EXPIRE;
+    const payload={
+        name:this.name,
+        userId:this._id,
+        role:this.role
+    }
+    const token= jwt.sign(payload,secretKey,{expiresIn:lifeTime});
+    return token;
 }
 
 module.exports=mongoose.model('User',userSchema);
