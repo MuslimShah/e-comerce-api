@@ -56,10 +56,13 @@ exports.login=async (req,res)=>{
     }
     //create token and attach it to cookie
     attachCookieToResponse(res,payload);
-    res.status(statusCode.CREATED).json({userId:user._id,name:user.name,role:user.role});    
+    res.status(statusCode.OK).json({userId:user._id,name:user.name,role:user.role});    
 }
 
 ///----------------------- LOGOUT USER ------------------------------------------ 
 exports.logOut=(req,res)=>{
-    res.send('logout route')    
+    res.cookie('token','asdf',{
+        expires:new Date(Date.now())
+    });
+    res.status(statusCode.OK).json({msg:'logged out'});  
 }
