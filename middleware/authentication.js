@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { unAuthenticatedError } = require("../errors");
+const { unAuthenticatedError,unAuthorizedError } = require("../errors");
 const User = require("../models/user");
 const { isTokenValid } = require("../utils/jwt");
 
@@ -19,4 +19,20 @@ const authenticateUser = (req, res, next) => {
   next();
 };
 
-module.exports = authenticateUser;
+//authorize permission for admin
+const authorizePermissions=(...roles)=>{
+    // if(req.user.role !=='admin'){
+    //     throw new unAuthorizedError('Unauthorized Error')
+    // }
+    // next()
+    //authorize user to the route if allowed
+    return (req,res,next)=>{
+      if(!roles.includes(req.user.role)){
+        throw new unAuthorizedError('Unauthorized Error')
+      }
+  
+      next()
+    }
+   
+}
+module.exports = {authenticateUser,authorizePermissions};
