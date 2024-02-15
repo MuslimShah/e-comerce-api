@@ -1,10 +1,12 @@
 require("express-async-errors");
 require("dotenv").config();
 const express = require("express");
+const cors=require('cors');
 
 //IMPORTING ROUTES
 //auth routes
 const authRoutes = require("./routes/authRoutes");
+const userRouter=require('./routes/userRoutes');
 
 //UTILS
 const pageNotFound = require("./utils/page-not-found");
@@ -24,13 +26,20 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 //use morgan to print req status and route info --> for debugging
 app.use(morgan("tiny"));
 
+//cors ploicy check
+app.use(cors());
+
 app.use((req,res,next)=>{
   console.log(req.signedCookies);
   next()
 })
 
 //routes setup
+//auth routes
 app.use("/api/v1/auth", authRoutes);
+
+//user routes
+app.use("/api/v1/users", userRouter);
 
 
 

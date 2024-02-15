@@ -61,7 +61,7 @@ exports.login=async (req,res)=>{
 
 ///----------------------- LOGOUT USER ------------------------------------------ 
 exports.logOut=(req,res)=>{
-    res.cookie('token','asdf',{
+    res.cookie('token','logout',{
         expires:new Date(Date.now())
     });
     res.status(statusCode.OK).json({msg:'logged out'});  
