@@ -9,8 +9,8 @@ const authRoutes = require("./routes/authRoutes");
 const userRouter=require('./routes/userRoutes');
 
 //UTILS
-const pageNotFound = require("./utils/page-not-found");
-const errorHandler = require("./utils/error-handler");
+const pageNotFound = require("./middleware/page-not-found");
+const errorHandler = require("./middleware/error-handler");
 //DB-CONNECTION
 const connectDb = require("./database/database");
 
@@ -28,11 +28,6 @@ app.use(morgan("tiny"));
 
 //cors ploicy check
 app.use(cors());
-
-app.use((req,res,next)=>{
-  console.log(req.signedCookies);
-  next()
-})
 
 //routes setup
 //auth routes
