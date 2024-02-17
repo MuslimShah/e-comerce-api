@@ -1,9 +1,18 @@
+/*=============================================
+=                   Imports                   =
+=============================================*/
 const statusCode = require("http-status-codes");
 const User = require("../models/user");
-const ObjectId = require("mongodb").ObjectId;
 const { BadRequest, unAuthenticatedError, notFound } = require("../errors");
-const { attachCookieToResponse,createTokenUser } = require("../utils");
+const { attachCookieToResponse, createTokenUser } = require("../utils");
 const bcrypt = require("bcryptjs");
+/*============  End of Imports  =============*/
+
+
+
+/*=============================================
+=                   Get Single User                   =
+=============================================*/
 
 exports.getSingleUser = async (req, res) => {
   //get id from params
@@ -18,6 +27,14 @@ exports.getSingleUser = async (req, res) => {
   res.status(statusCode.OK).json({ singleUser });
 };
 
+/*============  End of Get Single User  =============*/
+
+
+
+
+/*=============================================
+=                   Get All Users                   =
+=============================================*/
 exports.getAllUsers = async (req, res) => {
   //find all users
   const users = await User.find({ role: "user" }, { password: 0 });
@@ -26,29 +43,56 @@ exports.getAllUsers = async (req, res) => {
   }
   res.status(statusCode.OK).json({ msg: "all users", users });
 };
-//--------------- SHOW CURRENT USER --------------------------
+
+/*============  End of Get All Users  =============*/
+
+
+
+
+/*=============================================
+=                   Show Current User                   =
+=============================================*/
 exports.showCurrentUser = (req, res) => {
   //show current login user
   const user = req.user;
   res.status(statusCode.OK).json({ user });
 };
 
-//----------- updating user info -----------------------------
+/*============  End of Show Current User  =============*/
+
+
+
+
+/*=============================================
+=                   Update User                   =
+=============================================*/
+
 exports.updateUser = async (req, res) => {
   const { email, name } = req.body;
   // if(!email || !name){
   //   throw new BadRequest('Provide correct values');
   // }
-  const updateUser = await User.findOneAndUpdate(
+  const updatedUser = await User.findOneAndUpdate(
     { _id: req.user.userId },
     { email, name },
     { new: true, runValidators: true, projection: { password: 0 } }
   );
+  //send back the updated cookie and token
+  const tokenUser = createTokenUser(updatedUser);
+  attachCookieToResponse(res, tokenUser);
 
-  res.status(statusCode.OK).json({ msg: "update user", updateUser });
+  res.status(statusCode.OK).json({ msg: "update user", tokenUser });
 };
 
-//----------------- Update password middleware -------------
+/*============  End of Update User  =============*/
+
+
+
+
+/*=============================================
+=                   Update User Password                   =
+=============================================*/
+
 exports.updateUserPassword = async (req, res) => {
   //ask user to enter old password
   const { oldPassword, newPassword } = req.body;
@@ -64,7 +108,7 @@ exports.updateUserPassword = async (req, res) => {
   }
   user.password = newPassword;
   user.save();
-  const tokenUser=createTokenUser(user);
-  attachCookieToResponse(res,tokenUser);
   res.status(statusCode.OK).json({ msg: "password updated successfully" });
 };
+
+/*============  End of Update User Password  =============*/

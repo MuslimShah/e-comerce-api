@@ -1,3 +1,6 @@
+/*=============================================
+=                   Imports                   =
+=============================================*/
 const User = require("../models/user");
 const {
   BadRequest,
@@ -5,10 +8,15 @@ const {
   unAuthenticatedError,
 } = require("../errors");
 const statusCode = require("http-status-codes");
-const { attachCookieToResponse,createTokenUser } = require("../utils");
-              
+const { attachCookieToResponse, createTokenUser } = require("../utils");
 
-///-------------------------- REGISTER USER ------------------------------------
+/*============  End of Imports  =============*/
+
+
+
+/*=============================================
+=                   Register User                   =
+=============================================*/
 exports.register = async (req, res) => {
   let { name, email, password, role } = req.body;
   //checking for existing user
@@ -24,7 +32,7 @@ exports.register = async (req, res) => {
   const user = await User.create({ name, email, password, role });
 
   //payload for token creation
-  const tokenUser=createTokenUser(user);
+  const tokenUser = createTokenUser(user);
   //create token and send as cookie
   attachCookieToResponse(res, tokenUser);
   res
@@ -32,7 +40,15 @@ exports.register = async (req, res) => {
     .json({ userId: user._id, name: user.name, role: user.role });
 };
 
-///---------------------- LOGIN USER ---------------------------------------------
+/*============  End of Register User  =============*/
+
+
+
+
+/*=============================================
+=                   Login User                   =
+=============================================*/
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -51,7 +67,7 @@ exports.login = async (req, res) => {
     throw new unAuthenticatedError("Incorrect Password");
   }
   //payload for token creation
-  const tokenUser=createTokenUser(user);
+  const tokenUser = createTokenUser(user);
   //create token and attach it to cookie
   attachCookieToResponse(res, tokenUser);
   res
@@ -59,10 +75,21 @@ exports.login = async (req, res) => {
     .json({ userId: user._id, name: user.name, role: user.role });
 };
 
-///----------------------- LOGOUT USER ------------------------------------------
+/*============  End of Login User  =============*/
+
+
+
+
+
+/*=============================================
+=                   LogOut User                   =
+=============================================*/
+
 exports.logOut = (req, res) => {
   res.cookie("token", "logout", {
     expires: new Date(Date.now()),
   });
   res.status(statusCode.OK).json({ msg: "logged out" });
 };
+
+/*============  End of LogOut User  =============*/
