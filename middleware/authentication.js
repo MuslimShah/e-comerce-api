@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const { unAuthenticatedError,unAuthorizedError } = require("../errors");
+const { unAuthenticatedError, unAuthorizedError } = require("../errors");
 const User = require("../models/user");
-const { isTokenValid } = require("../utils/jwt");
+const { isTokenValid } = require("../utils");
 
 //authenticaton for users --->role 'user'
 const authenticateUser = (req, res, next) => {
@@ -20,19 +20,18 @@ const authenticateUser = (req, res, next) => {
 };
 
 //authorize permission for admin
-const authorizePermissions=(...roles)=>{
-    // if(req.user.role !=='admin'){
-    //     throw new unAuthorizedError('Unauthorized Error')
-    // }
-    // next()
-    //authorize user to the route if allowed
-    return (req,res,next)=>{
-      if(!roles.includes(req.user.role)){
-        throw new unAuthorizedError('Unauthorized Error')
-      }
-  
-      next()
+const authorizePermissions = (...roles) => {
+  // if(req.user.role !=='admin'){
+  //     throw new unAuthorizedError('Unauthorized Error')
+  // }
+  // next()
+  //authorize user to the route if allowed
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new unAuthorizedError("Unauthorized Error");
     }
-   
-}
-module.exports = {authenticateUser,authorizePermissions};
+
+    next();
+  };
+};
+module.exports = { authenticateUser, authorizePermissions };

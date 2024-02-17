@@ -1,6 +1,4 @@
 const jwt=require('jsonwebtoken');
-const statusCode=require('http-status-codes')
-
 //creating token
 exports.createJwt=(payload)=>{
     const secretKey=process.env.JWT_SECRET;

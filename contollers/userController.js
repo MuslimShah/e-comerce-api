@@ -1,7 +1,9 @@
 const statusCode = require("http-status-codes");
 const User = require("../models/user");
 const ObjectId = require("mongodb").ObjectId;
-const { BadRequest, CustomAPIError, notFound } = require("../errors");
+const { BadRequest, unAuthenticatedError, notFound } = require("../errors");
+const { attachCookieToResponse,createTokenUser } = require("../utils");
+const bcrypt = require("bcryptjs");
 
 exports.getSingleUser = async (req, res) => {
   //get id from params
@@ -24,13 +26,45 @@ exports.getAllUsers = async (req, res) => {
   }
   res.status(statusCode.OK).json({ msg: "all users", users });
 };
+//--------------- SHOW CURRENT USER --------------------------
 exports.showCurrentUser = (req, res) => {
-  res.status(statusCode.OK).json({ msg: "current user" });
+  //show current login user
+  const user = req.user;
+  res.status(statusCode.OK).json({ user });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(statusCode.OK).json({ msg: "update user" });
+//----------- updating user info -----------------------------
+exports.updateUser = async (req, res) => {
+  const { email, name } = req.body;
+  // if(!email || !name){
+  //   throw new BadRequest('Provide correct values');
+  // }
+  const updateUser = await User.findOneAndUpdate(
+    { _id: req.user.userId },
+    { email, name },
+    { new: true, runValidators: true, projection: { password: 0 } }
+  );
+
+  res.status(statusCode.OK).json({ msg: "update user", updateUser });
 };
-exports.updateUserPassword = (req, res) => {
-  res.status(statusCode.OK).json({ msg: "update password" });
+
+//----------------- Update password middleware -------------
+exports.updateUserPassword = async (req, res) => {
+  //ask user to enter old password
+  const { oldPassword, newPassword } = req.body;
+  if (!oldPassword || !newPassword) {
+    throw new BadRequest("Please provide old password and new password");
+  }
+  //first fetch entire user
+  const user = await User.findOne({ _id: req.user.userId });
+  //compare old password with save one
+  const isMatched = await user.comparePassword(oldPassword);
+  if (!isMatched) {
+    throw new unAuthenticatedError("Invalid Credintials");
+  }
+  user.password = newPassword;
+  user.save();
+  const tokenUser=createTokenUser(user);
+  attachCookieToResponse(res,tokenUser);
+  res.status(statusCode.OK).json({ msg: "password updated successfully" });
 };

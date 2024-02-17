@@ -5,7 +5,8 @@ const {
   unAuthenticatedError,
 } = require("../errors");
 const statusCode = require("http-status-codes");
-const { attachCookieToResponse } = require("../utils/jwt");
+const { attachCookieToResponse,createTokenUser } = require("../utils");
+              
 
 ///-------------------------- REGISTER USER ------------------------------------
 exports.register = async (req, res) => {
@@ -23,13 +24,9 @@ exports.register = async (req, res) => {
   const user = await User.create({ name, email, password, role });
 
   //payload for token creation
-  const payload = {
-    name: user.name,
-    userId: user._id,
-    role: user.role,
-  };
+  const tokenUser=createTokenUser(user);
   //create token and send as cookie
-  attachCookieToResponse(res, payload);
+  attachCookieToResponse(res, tokenUser);
   res
     .status(statusCode.CREATED)
     .json({ userId: user._id, name: user.name, role: user.role });
@@ -54,13 +51,9 @@ exports.login = async (req, res) => {
     throw new unAuthenticatedError("Incorrect Password");
   }
   //payload for token creation
-  const payload = {
-    name: user.name,
-    userId: user._id,
-    role: user.role,
-  };
+  const tokenUser=createTokenUser(user);
   //create token and attach it to cookie
-  attachCookieToResponse(res, payload);
+  attachCookieToResponse(res, tokenUser);
   res
     .status(statusCode.OK)
     .json({ userId: user._id, name: user.name, role: user.role });

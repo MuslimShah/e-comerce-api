@@ -21,7 +21,7 @@ router.get(
   authorizePermissions("admin", "owner"),
   getAllUsers
 );
-router.get("/showMe", showCurrentUser);
+router.get("/showMe",authenticateUser, showCurrentUser);
 router.get("/:id", authenticateUser, getSingleUser);
 
 //Patch Routes--->For Updating
