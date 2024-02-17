@@ -35,6 +35,7 @@ exports.getSingleUser = async (req, res) => {
 /*=============================================
 =                   Get All Users                   =
 =============================================*/
+//only accessible to admins
 exports.getAllUsers = async (req, res) => {
   //find all users
   const users = await User.find({ role: "user" }, { password: 0 });
@@ -69,9 +70,9 @@ exports.showCurrentUser = (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const { email, name } = req.body;
-  // if(!email || !name){
-  //   throw new BadRequest('Provide correct values');
-  // }
+  if(!email || !name){
+    throw new BadRequest('Provide correct values');
+  }
   const updatedUser = await User.findOneAndUpdate(
     { _id: req.user.userId },
     { email, name },
@@ -81,7 +82,7 @@ exports.updateUser = async (req, res) => {
   const tokenUser = createTokenUser(updatedUser);
   attachCookieToResponse(res, tokenUser);
 
-  res.status(statusCode.OK).json({ msg: "update user", tokenUser });
+  res.status(statusCode.OK).json({ msg: "update user", user:tokenUser });
 };
 
 /*============  End of Update User  =============*/
@@ -108,7 +109,7 @@ exports.updateUserPassword = async (req, res) => {
   }
   user.password = newPassword;
   user.save();
-  res.status(statusCode.OK).json({ msg: "password updated successfully" });
+  res.status(statusCode.OK).json({ msg: "password updated successfully",user:tokenUser });
 };
 
 /*============  End of Update User Password  =============*/
