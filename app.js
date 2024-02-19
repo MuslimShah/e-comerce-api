@@ -49,7 +49,7 @@ const start = async () => {
     //DB-CONNECTION
     await connectDb(process.env.MONGO_URI);
     console.log("connected to database");
-    app.listen(PORT, () => console.log(`CONNECTED ON PORT ${PORT}`));
+    app.listen(PORT,'0.0.0.0', () => console.log(`CONNECTED ON PORT ${PORT}`));
   } catch (error) {
     console.log("DB connection error");
   }

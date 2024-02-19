@@ -3,8 +3,8 @@
 =============================================*/
 const statusCode = require("http-status-codes");
 const User = require("../models/user");
-const { BadRequest, unAuthenticatedError, notFound } = require("../errors");
-const { attachCookieToResponse, createTokenUser } = require("../utils");
+const { BadRequest, unAuthenticatedError, notFound, unAuthorizedError } = require("../errors");
+const { attachCookieToResponse, createTokenUser,checkPermissions} = require("../utils");
 const bcrypt = require("bcryptjs");
 /*============  End of Imports  =============*/
 
@@ -17,6 +17,8 @@ const bcrypt = require("bcryptjs");
 exports.getSingleUser = async (req, res) => {
   //get id from params
   const { id: userId } = req.params;
+  //checking permissions before accessing single user
+  checkPermissions(req.user,userId);
   const singleUser = await User.findOne(
     { _id: userId, role: "user" },
     { password: 0 }
