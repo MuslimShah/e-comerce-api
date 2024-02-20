@@ -1,10 +1,7 @@
 const {unAuthorizedError}=require('../errors')
 
 /**
-
-    TODO:
     - if a user is accessing their record with id
-
     - they might get record of other record if they have id
     - so we need to properly check for permissions properly
     - only admin is able to access each user with id
