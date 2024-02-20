@@ -16,6 +16,7 @@ const connectDb = require("./database/database");
 
 //morgan package ==> a middleware to know what route you are hitting
 const morgan = require("morgan");
+const User= require('./models/user');
 const cookieParser=require('cookie-parser')
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,11 +29,16 @@ app.use(morgan("tiny"));
 
 //cors ploicy check
 app.use(cors());
+app.get('/', async(req,res)=>{
+  const users= await User.find({},{password:0});
+  res.status(200).json(users);
+
+})
 
 //routes setup
 //auth routes
 app.use("/api/v1/auth", authRoutes);
-
+ 
 //user routes
 app.use("/api/v1/users", userRouter);
 

@@ -1,45 +1,70 @@
-const mongoose=require('mongoose');
+const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
-const ProductSchema= new Schema({
-    name:{
-        type:String
+//product model
+const ProductSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "must provide a name"],
+      trim: true,
+      maxlength: [100, "Name cannot exceed 100 characters"],
     },
-    price:{
-        type:Number
+    price: {
+      type: Number,
+      required: [true, "must provide product price"],
+      default: 0,
     },
-    description:{
-        type:String
+    description: {
+      type: String,
+      required: [true, "must provide product description"],
+      maxlength: [2000, "description cannot exceed 2000 characters"],
     },
-    image:{
-        type:String
+    image: {
+      type: String,
+      required: [true, "must provide a picture"],
     },
-    category:{
-        String
+    category: {
+      type: String,
+      required: [true, "Must select a category"],
+      enum: ["kitchen", "office", "bedroom", "kids"],
     },
-    company:{
-        type:String
+    company: {
+      type: String,
+      required: [true, "must provide company name"],
+      enum: {
+        values: ["Uniliver", "Nestle", "Pepsi", "Cocacola"],
+        message: "{VALUE} is not supported",
+      },
     },
-    colors:{
-        type:[]
+    colors: {
+      type: [String],
+      required: true,
     },
-    featured:{
-        type:Boolean
+    featured: {
+      type: Boolean,
+      default: false,
     },
-    freeShipping:{
-        type:Boolean
+    freeShipping: {
+      type: Boolean,
+      default: false,
     },
-    inventory:{
-        type:Number
+    inventory: {
+      type: Number,
+      required: true,
+      default: 0,
     },
-    averegeRating:{
-        type:Number
+    averegeRating: {
+      type: Number,
+      default: 0,
     },
-    user:{
-        type:Schema.Types.ObjectId,
-        ref:'User'
-    }
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required:true
+    },
+  },
+  { timestamps: true }
+);
 
-},{timestamps:true});
-
-module.exports=mongoose.model("Products",ProductSchema);
+module.exports = mongoose.model("Products", ProductSchema);
