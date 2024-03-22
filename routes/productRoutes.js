@@ -2,26 +2,32 @@
 =                   Imports                   =
 =============================================*/
 const {
-    createProduct,
-    getSingleProduct,
-    getAllProducts,
-    updateProduct,
-    deleteProduct,
-  } = require("../contollers/productsController");
-  const {
-    authenticateUser,
-    authorizePermissions,
-  } = require("../middleware/authentication");
-  const express = require("express");
-  const router = express.Router();
-  
-
+  createProduct,
+  getSingleProduct,
+  getAllProducts,
+  updateProduct,
+  deleteProduct,
+  uploadImage,
+} = require("../contollers/productsController");
+const {
+  authenticateUser,
+  authorizePermissions,
+} = require("../middleware/authentication");
+const express = require("express");
+const router = express.Router();
 
 /*============  End of Imports  =============*/
 
 /*=============================================
 =                   Product  Routes                   =
 =============================================*/
+
+router.post(
+  "/uploadImage",
+  authenticateUser,
+  authorizePermissions("admin"),
+  uploadImage
+);
 
 //Get routes
 //Get ----> All products publically accessible
@@ -42,7 +48,7 @@ router.post(
 
 //patch routes---> for updating product details
 router.patch(
-  "/updateProduct",
+  "/:id",
   authenticateUser,
   authorizePermissions("admin"),
   updateProduct
@@ -50,7 +56,7 @@ router.patch(
 
 //delete route ---->for deleting product
 router.delete(
-  "/deleteProduct",
+  "/:id",
   authenticateUser,
   authorizePermissions("admin"),
   deleteProduct
