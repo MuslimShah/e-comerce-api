@@ -15,7 +15,7 @@ const path = require("path");
 exports.createProduct = async (req, res) => {
   req.body.user = req.user.userId;
   const product = await Product.create(req.body);
-  res.status(statusCodes.CREATED).json({ msg: "create product", product });
+  res.status(statusCodes.CREATED).json({ msg: "Product Created", product });
 };
 
 /*============  End of Create Product  =============*/
