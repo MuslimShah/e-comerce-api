@@ -13,6 +13,7 @@ const fileUpload = require("express-fileupload");
 const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const productRouter = require("./routes/productRoutes");
+const reviewsRoutes = require("./routes/reviewsRoutes");
 
 //UTILS
 const pageNotFound = require("./middleware/page-not-found");
@@ -58,6 +59,9 @@ app.use("/api/v1/users", userRouter);
 
 //product routes
 app.use("/api/v1/products", productRouter);
+
+//reviews routes
+app.use("/api/v1/reviews", reviewsRoutes);
 
 /*============  End of Handling Routes  =============*/
 
