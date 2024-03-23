@@ -4,6 +4,7 @@
 const statusCodes = require("http-status-codes");
 const Product = require("../models/Product");
 const { notFound } = require("../errors");
+const path = require("path");
 
 /*============  End of Imports Section  =============*/
 
@@ -24,6 +25,7 @@ exports.createProduct = async (req, res) => {
 =============================================*/
 
 exports.getSingleProduct = async (req, res) => {
+  //getting single product
   const productId = req.params.id;
   const product = await Product.find({ _id: productId });
   res.status(statusCodes.OK).json(product);
@@ -58,8 +60,18 @@ exports.getAllProducts = async (req, res) => {
 =                   Update Product                   =
 =============================================*/
 
-exports.updateProduct = (req, res) => {
-  res.status(statusCodes.OK).json({ msg: "update product" });
+exports.updateProduct = async (req, res) => {
+  //*finding product by id and updating it
+  const productId = req.params.id;
+  const data = req.body;
+  const newProduct = await Product.findOneAndUpdate({ _id: productId }, data, {
+    new: true,
+    runValidators: true,
+  });
+  if (!newProduct) {
+    throw new notFound(`Product not found with id:${productId}`);
+  }
+  res.status(statusCodes.OK).json({ msg: "product updated", newProduct });
 };
 
 /*============  End of Update Product  =============*/
@@ -70,11 +82,12 @@ exports.updateProduct = (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
   const productId = req.params.id;
-  const deletedProduct = await Product.findOneAndDelete({ _id: productId });
-  if (!deletedProduct) {
+  const product = await Product.findOne({ _id: productId });
+  if (!product) {
     throw new notFound(`Product not found with id:${productId}`);
   }
-  res.status(statusCodes.OK).json({ msg: "product Deleted", deletedProduct });
+  await product.remove();
+  res.status(statusCodes.OK).json({ msg: "product Deleted" });
 };
 
 /*============  End of Delete Product  =============*/
@@ -83,8 +96,31 @@ exports.deleteProduct = async (req, res) => {
 =                   Upload Product Image                   =
 =============================================*/
 
-exports.uploadImage = (req, res) => {
-  res.status(statusCodes.OK).json({ msg: "image uploaded" });
+exports.uploadImage = async (req, res) => {
+  let productImage;
+  console.log(req.files);
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+  productImage = req.files.image;
+  if (!productImage.mimetype.startsWith("image")) {
+    throw new BadRequest("Please upload image only");
+  }
+  //check for the size
+  const maxSize = 1024 * 1024; //1Mb
+  if (productImage.size > maxSize) {
+    throw new BadRequest("Please uplad image less than 1MB");
+  }
+
+  const imagePath = path.join(
+    __dirname,
+    "../public/uploads/" + `${productImage.name}`
+  );
+
+  await productImage.mv(imagePath);
+  res
+    .status(statusCodes.OK)
+    .json({ msg: "image uploaded", src: `/uploads/${productImage.name}` });
 };
 
 /*============  End of Upload Product Image  =============*/

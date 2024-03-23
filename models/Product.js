@@ -23,6 +23,7 @@ const ProductSchema = new Schema(
     image: {
       type: String,
       required: [true, "must provide a picture"],
+      default: "/uploads/example.jpeg",
     },
     category: {
       type: String,
@@ -61,7 +62,7 @@ const ProductSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required:true
+      required: true,
     },
   },
   { timestamps: true }
