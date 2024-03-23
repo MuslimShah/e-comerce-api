@@ -27,7 +27,7 @@ exports.createProduct = async (req, res) => {
 exports.getSingleProduct = async (req, res) => {
   //getting single product
   const productId = req.params.id;
-  const product = await Product.find({ _id: productId });
+  const product = await Product.find({ _id: productId }).populate("reviews");
   res.status(statusCodes.OK).json(product);
 };
 
@@ -44,6 +44,7 @@ exports.getAllProducts = async (req, res) => {
   const limit = req.query.limit || 10;
 
   const products = await Product.find({})
+    .populate("reviews")
     .skip((page - 1) * limit)
     .limit(limit);
   const totalProducts = await Product.countDocuments();

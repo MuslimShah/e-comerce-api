@@ -4,7 +4,7 @@
 const statusCodes = require("http-status-codes");
 const Reviews = require("../models/Reviews");
 const Product = require("../models/Product");
-const { notFound, BadRequest, unAuthorizedError } = require("../errors");
+const { notFound, BadRequest } = require("../errors");
 const checkPermissions = require("../utils/checkPermissions");
 
 /*============  End of Import section  =============*/
@@ -54,6 +54,8 @@ exports.getAllReviews = async (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
   const reviews = await Reviews.find({})
+    .populate({ path: "product", select: "name company price" })
+    .populate({ path: "user", select: "name" })
     .skip((page - 1) * limit)
     .limit(limit);
   const totalReviews = await Reviews.countDocuments();
@@ -71,7 +73,9 @@ exports.getAllReviews = async (req, res) => {
 exports.getSingleReview = async (req, res) => {
   const reviewId = req.params.id;
   //*finding review with given id  ---> if not found return not found
-  const review = await Reviews.findOne({ _id: reviewId });
+  const review = await Reviews.findOne({ _id: reviewId })
+    .populate({ path: "product", select: "name company price" })
+    .populate({ path: "user", select: "name" });
   if (!review) {
     throw new notFound(`No review found with id:${reviewId}`);
   }
@@ -87,18 +91,17 @@ exports.getSingleReview = async (req, res) => {
 exports.updateReview = async (req, res) => {
   const reviewId = req.params.id;
   const data = req.body;
-  const updatedReview = await Reviews.findOneAndUpdate(
-    { _id: reviewId },
-    data,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-  if (!updatedReview) {
+  const review = await Reviews.findOne({ _id: reviewId });
+  //* First checking if review exists
+  if (!review) {
     throw new notFound(`No review found with id:${reviewId}`);
   }
-  res.status(statusCodes.OK).json(updatedReview);
+  //*Checking if user has permissions to delete review --> user can only delete their own review
+  checkPermissions(req.user, review.user);
+  const updatedReview = await Reviews.updateOne({ _id: reviewId }, data, {
+    new: true,
+  });
+  res.status(statusCodes.OK).json({ msg: "review updated" });
 };
 
 /*============  End of Update Review  =============*/
@@ -110,7 +113,6 @@ exports.updateReview = async (req, res) => {
 exports.deleteReview = async (req, res) => {
   const reviewId = req.params.id;
   const review = await Reviews.findOne({ _id: reviewId });
-  console.log(review);
   //* First checking if review exists
   if (!review) {
     throw new notFound(`No review found with id:${reviewId}`);
