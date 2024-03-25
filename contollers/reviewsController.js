@@ -121,6 +121,7 @@ exports.deleteReview = async (req, res) => {
   checkPermissions(req.user, review.user);
 
   await Reviews.deleteOne({ _id: reviewId });
+  await Reviews.calculateAveregeRating(review.product);
 
   res.status(statusCodes.OK).json({ msg: "Review Deleted" });
 };
