@@ -7,6 +7,11 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+//*Security packages
+const rateLimiter = require("express-rate-limit");
+const xssClean = require("xss-clean");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 
 //IMPORTING ROUTES
 //auth routes
@@ -22,7 +27,7 @@ const errorHandler = require("./middleware/error-handler");
 //DB-CONNECTION
 const connectDb = require("./database/database");
 
-//morgan package ==> a middleware to know what route you are hitting
+//morgan package ==> a middleware to know which route you are hitting
 const morgan = require("morgan");
 const User = require("./models/user");
 const cookieParser = require("cookie-parser");
@@ -36,7 +41,16 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
-app.set("view engine", "views");
+app.set("trust proxy", 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
+app.use(helmet());
+app.use(xssClean());
+app.use(mongoSanitize());
 app.use(express.json());
 app.use(express.static("./public"));
 //file upload

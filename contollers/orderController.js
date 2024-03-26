@@ -56,7 +56,6 @@ exports.createOrder = async (req, res) => {
     subTotal += item.amount * price;
   }
   const total = tax + subTotal + shippingFee;
-  console.log("total:", total);
 
   const paymentIntent = await fakeStripeApi({
     amount: total,
@@ -96,6 +95,9 @@ exports.getAllOrders = async (req, res) => {
   const orders = await Order.find({})
     .skip((page - 1) * limit)
     .limit(limit);
+  if (orders.length < 1) {
+    throw new notFound(`No orders found`);
+  }
   res.status(statusCodes.OK).json({ orders, totalPages, count: totalOrders });
 };
 
@@ -108,8 +110,11 @@ exports.getAllOrders = async (req, res) => {
 exports.getSingleOrder = async (req, res) => {
   const orderId = req.params.id;
   //* finding order
-  const order = await Order.find({ _id: orderId });
+  const order = await Order.findOne({ _id: orderId });
   checkPermissions(req.user, order.user);
+  if (!order) {
+    throw new notFound(`No order found with id :${orderId}`);
+  }
   res.status(statusCodes.OK).json(order);
 };
 
@@ -130,6 +135,9 @@ exports.getCurrentUserOrders = async (req, res) => {
   const orders = await Order.find({ user: req.user.userId })
     .skip((page - 1) * limit)
     .limit(limit);
+  if (orders.length < 1) {
+    throw new notFound(`No orders found`);
+  }
   res.status(statusCodes.OK).json({ orders, totalPages, count: totalOrders });
 };
 
@@ -140,7 +148,18 @@ exports.getCurrentUserOrders = async (req, res) => {
 =============================================*/
 
 exports.updateOrder = async (req, res) => {
-  res.status(statusCodes.OK).json({ msg: "updateOrder" });
+  const orderId = req.params.id;
+  const { paymentIntentId } = req.body;
+  const order = await Order.findOne({ _id: orderId, user: req.user.userId });
+  if (!order) {
+    throw new notFound(`No order Found with id:${orderId}`);
+  }
+  checkPermissions(req.user, order.user);
+  order.paymentIntentId = paymentIntentId;
+  order.status = "paid";
+  order.save();
+
+  res.status(statusCodes.OK).json({ msg: "order completed" });
 };
 
 /*============  End of Update Order  =============*/
