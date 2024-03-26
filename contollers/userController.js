@@ -3,12 +3,14 @@
 =============================================*/
 const statusCode = require("http-status-codes");
 const User = require("../models/user");
-const { BadRequest, unAuthenticatedError, notFound, unAuthorizedError } = require("../errors");
-const { attachCookieToResponse, createTokenUser,checkPermissions} = require("../utils");
+const { BadRequest, unAuthenticatedError, notFound } = require("../errors");
+const {
+  attachCookieToResponse,
+  createTokenUser,
+  checkPermissions,
+} = require("../utils");
 const bcrypt = require("bcryptjs");
 /*============  End of Imports  =============*/
-
-
 
 /*=============================================
 =                   Get Single User                   =
@@ -18,7 +20,7 @@ exports.getSingleUser = async (req, res) => {
   //get id from params
   const { id: userId } = req.params;
   //checking permissions before accessing single user
-  checkPermissions(req.user,userId);
+  checkPermissions(req.user, userId);
   const singleUser = await User.findOne(
     { _id: userId, role: "user" },
     { password: 0 }
@@ -30,9 +32,6 @@ exports.getSingleUser = async (req, res) => {
 };
 
 /*============  End of Get Single User  =============*/
-
-
-
 
 /*=============================================
 =                   Get All Users                   =
@@ -49,9 +48,6 @@ exports.getAllUsers = async (req, res) => {
 
 /*============  End of Get All Users  =============*/
 
-
-
-
 /*=============================================
 =                   Show Current User                   =
 =============================================*/
@@ -63,17 +59,14 @@ exports.showCurrentUser = (req, res) => {
 
 /*============  End of Show Current User  =============*/
 
-
-
-
 /*=============================================
 =                   Update User                   =
 =============================================*/
 
 exports.updateUser = async (req, res) => {
   const { email, name } = req.body;
-  if(!email || !name){
-    throw new BadRequest('Provide correct values');
+  if (!email || !name) {
+    throw new BadRequest("Provide correct values");
   }
   const updatedUser = await User.findOneAndUpdate(
     { _id: req.user.userId },
@@ -84,13 +77,10 @@ exports.updateUser = async (req, res) => {
   const tokenUser = createTokenUser(updatedUser);
   attachCookieToResponse(res, tokenUser);
 
-  res.status(statusCode.OK).json({ msg: "update user", user:tokenUser });
+  res.status(statusCode.OK).json({ msg: "update user", user: tokenUser });
 };
 
 /*============  End of Update User  =============*/
-
-
-
 
 /*=============================================
 =                   Update User Password                   =
@@ -111,7 +101,9 @@ exports.updateUserPassword = async (req, res) => {
   }
   user.password = newPassword;
   user.save();
-  res.status(statusCode.OK).json({ msg: "password updated successfully",user:tokenUser });
+  res
+    .status(statusCode.OK)
+    .json({ msg: "password updated successfully", user: tokenUser });
 };
 
 /*============  End of Update User Password  =============*/

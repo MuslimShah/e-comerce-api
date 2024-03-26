@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 //schema for single cart item coming from frontend
-const singleCartItemSchema = mongoose.Schema({
+const singleOrderItemSchema = mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   image: { type: String, required: true },
@@ -31,8 +31,8 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    cartItems: {
-      type: [singleCartItemSchema],
+    orderItems: {
+      type: [singleOrderItemSchema],
     },
     status: {
       type: String,

@@ -10,7 +10,7 @@ const { unAuthorizedError } = require("../errors");
 */
 const checkPermissions = (requestUser, resourceUserId) => {
   if (requestUser.role == "admin") return true;
-  if (requestUser.userId !== resourceUserId.toString()) {
+  if (requestUser.userId !== resourceUserId) {
     throw new unAuthorizedError("Your are not authorized to access this user");
   }
   console.log("matched");
