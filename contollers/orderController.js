@@ -18,16 +18,6 @@ const fakeStripeApi = async function ({ amount, currency }) {
 };
 
 /*=============================================
-=                   Get All Orders -->Admin only                   =
-=============================================*/
-
-exports.getAllOrders = async (req, res) => {
-  res.status(statusCodes.OK).json({ msg: "getAllOrders" });
-};
-
-/*============  End of Get All Orders -->Admin only  =============*/
-
-/*=============================================
 =                   Create Order                   =
 =============================================*/
 
@@ -92,6 +82,26 @@ exports.createOrder = async (req, res) => {
 /*============  End of Create Order  =============*/
 
 /*=============================================
+=                   Get All Orders -->Admin only                   =
+=============================================*/
+
+exports.getAllOrders = async (req, res) => {
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 10;
+  //counting total orders
+  const totalOrders = await Order.countDocuments();
+  //finding total pages
+  const totalPages = Math.ceil(totalOrders / limit);
+  //getting orders from database
+  const orders = await Order.find({})
+    .skip((page - 1) * limit)
+    .limit(limit);
+  res.status(statusCodes.OK).json({ orders, totalPages, count: totalOrders });
+};
+
+/*============  End of Get All Orders -->Admin only  =============*/
+
+/*=============================================
 =                   Get Single Order                   =
 =============================================*/
 
@@ -110,7 +120,17 @@ exports.getSingleOrder = async (req, res) => {
 =============================================*/
 
 exports.getCurrentUserOrders = async (req, res) => {
-  res.status(statusCodes.OK).json({ msg: "getCurrentUserOrders" });
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 10;
+  //counting total orders
+  const totalOrders = await Order.countDocuments();
+  //finding total pages
+  const totalPages = Math.ceil(totalOrders / limit);
+  //getting orders from database
+  const orders = await Order.find({ user: req.user.userId })
+    .skip((page - 1) * limit)
+    .limit(limit);
+  res.status(statusCodes.OK).json({ orders, totalPages, count: totalOrders });
 };
 
 /*============  End of Get Current User Orders  =============*/
