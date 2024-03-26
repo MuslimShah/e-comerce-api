@@ -14,6 +14,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const productRouter = require("./routes/productRoutes");
 const reviewsRoutes = require("./routes/reviewsRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 //UTILS
 const pageNotFound = require("./middleware/page-not-found");
@@ -62,6 +63,9 @@ app.use("/api/v1/products", productRouter);
 
 //reviews routes
 app.use("/api/v1/reviews", reviewsRoutes);
+
+//order routes
+app.use("/api/v1/orders", orderRoutes);
 
 /*============  End of Handling Routes  =============*/
 
