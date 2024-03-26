@@ -91,5 +91,8 @@ ReviewsSchema.post("save", async function () {
 //   await this.model.calculateAveregeRating(reviewToDelete.product);
 //   next();
 // });
+ReviewsSchema.post("deleteOne", async function (doc, next) {
+  console.log(this);
+});
 
 module.exports = mongoose.model("Reviews", ReviewsSchema);
