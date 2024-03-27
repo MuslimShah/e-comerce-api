@@ -4,7 +4,7 @@
   "description": "ecomerce api followed from a udemy course",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
