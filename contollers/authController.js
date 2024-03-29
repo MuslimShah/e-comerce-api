@@ -12,6 +12,8 @@ const statusCode = require("http-status-codes");
 const { attachCookieToResponse, createTokenUser } = require("../utils");
 const crypto = require("crypto");
 const sendVerificationEmail = require("../utils/sendVerificationEmail");
+const sendPasswordResetEmail = require("../utils/sendPasswordResetEmail");
+const createHash = require("../utils/createHash");
 
 /*============  End of Imports  =============*/
 
@@ -45,7 +47,7 @@ exports.register = async (req, res) => {
       name: user.name,
       email: user.email,
       verificationToken: user.verificationToken,
-      origin: `http://localhost:3000`,
+      origin: process.env.ORIGIN,
     });
   } catch (error) {
     await User.deleteOne({ email: email });
@@ -142,7 +144,6 @@ exports.login = async (req, res) => {
 
 exports.logOut = async (req, res) => {
   //remove refresh token of user from db
-  console.log(req.user);
   await Token.findOneAndDelete({ user: req.user.userId });
   res.cookie("accessToken", "logout", {
     expires: new Date(Date.now()),
@@ -154,3 +155,71 @@ exports.logOut = async (req, res) => {
 };
 
 /*============  End of LogOut User  =============*/
+
+/*=============================================
+=                   Forgot Passord                   =
+=============================================*/
+
+exports.forgotPassord = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new BadRequest("Please provide valid email");
+  }
+  const passwordToken = crypto.randomBytes(40).toString("hex");
+  const tenMinutes = 1000 * 60 * 10;
+  const passwordTokenExpDate = new Date(Date.now() + tenMinutes);
+  const user = await User.findOneAndUpdate(
+    { email: email, isVerified: true },
+    {
+      $set: {
+        passwordToken: createHash(passwordToken),
+        passwordTokenExpDate: passwordTokenExpDate,
+      },
+    },
+    { new: true }
+  );
+  if (!user) {
+    throw new unAuthenticatedError(`User not found with email:${email}`);
+  }
+  try {
+    await sendPasswordResetEmail({
+      name: user.name,
+      email: user.email,
+      passwordToken: passwordToken,
+      origin: process.env.ORIGIN,
+    });
+  } catch (error) {
+    throw new CustomAPIError("Unable to reset password try again");
+  }
+  res.status(statusCode.OK).json({ msg: "check email to reset password" });
+};
+
+/*============  End of Forgot Passord  =============*/
+
+/*=============================================
+=                   Reset Passord                   =
+=============================================*/
+
+exports.resetPassword = async (req, res) => {
+  const { token, email, password } = req.body;
+  if (!token || !email || !password) {
+    throw new BadRequest("please provide all values");
+  }
+  const user = await User.findOne({ email });
+
+  if (user) {
+    const currentDate = new Date();
+    if (
+      user.passwordToken === createHash(token) &&
+      user.passwordTokenExpDate > currentDate
+    ) {
+      user.password = password;
+      user.passwordToken = null;
+      user.passwordTokenExpDate = null;
+      await user.save();
+    }
+  }
+  res.status(statusCode.OK).json({ msg: "reset passwrod" });
+};
+
+/*============  End of Reset Passord  =============*/

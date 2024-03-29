@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
   verified: {
     type: Date,
   },
+  passwordToken: {
+    type: String,
+  },
+  passwordTokenExpDate: {
+    type: Date,
+  },
   role: {
     type: String,
     enum: ["admin", "user"],
