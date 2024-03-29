@@ -10,7 +10,7 @@ const {
 const statusCode = require("http-status-codes");
 const { attachCookieToResponse, createTokenUser } = require("../utils");
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
+const sendVerificationEmail = require("../utils/sendVerificationEmail");
 
 /*============  End of Imports  =============*/
 
@@ -37,8 +37,19 @@ exports.register = async (req, res) => {
     role,
     verificationToken,
   });
+
   //* Sending email to user using mailerSend
-  await sendEmail(user);
+  try {
+    await sendVerificationEmail({
+      name: user.name,
+      email: user.email,
+      verificationToken: user.verificationToken,
+      origin: `http://localhost:3000`,
+    });
+  } catch (error) {
+    await User.deleteOne({ email: email });
+    throw new CustomAPIError("Unable to register try again", 500);
+  }
   res
     .status(statusCode.CREATED)
     .json({ msg: "Your account is registered .Please verify email" });
