@@ -2,6 +2,7 @@
 =                   Imports                   =
 =============================================*/
 const User = require("../models/user");
+const Token = require("../models/Token");
 const {
   BadRequest,
   CustomAPIError,
@@ -104,13 +105,33 @@ exports.login = async (req, res) => {
   if (!user.isVerified) {
     throw new unAuthenticatedError("please verify email");
   }
-  //payload for token creation
-  const tokenUser = createTokenUser(user);
+
+  //create token user
+  const tokenUser = createTokenUser({ user });
+  let refreshToken = "";
+  //checking for existing token
+  const existingToken = await Token.findOne({ user: user._id });
+  if (existingToken) {
+    const { isValid } = existingToken;
+    if (!isValid) {
+      throw new unAuthenticatedError("Invalid Credintials");
+    }
+    refreshToken = existingToken.refreshToken;
+    //create token and attach it to cookie
+    attachCookieToResponse({ res, user: tokenUser, refreshToken });
+    return res.status(statusCode.OK).json({ tokenUser });
+  }
+
+  //cif not token found --->create new token
+  refreshToken = crypto.randomBytes(40).toString("hex");
+  const userAgent = req.headers["user-agent"];
+  const ip = req.ip;
+  const userToken = { refreshToken, userAgent, ip, user: user._id };
+  await Token.create(userToken);
+
   //create token and attach it to cookie
-  attachCookieToResponse(res, tokenUser);
-  res
-    .status(statusCode.OK)
-    .json({ userId: user._id, name: user.name, role: user.role });
+  attachCookieToResponse({ res, tokenUser, refreshToken });
+  res.status(statusCode.OK).json({ tokenUser });
 };
 
 /*============  End of Login User  =============*/
@@ -119,8 +140,14 @@ exports.login = async (req, res) => {
 =                   LogOut User                   =
 =============================================*/
 
-exports.logOut = (req, res) => {
-  res.cookie("token", "logout", {
+exports.logOut = async (req, res) => {
+  //remove refresh token of user from db
+  console.log(req.user);
+  await Token.findOneAndDelete({ user: req.user.userId });
+  res.cookie("accessToken", "logout", {
+    expires: new Date(Date.now()),
+  });
+  res.cookie("refreshToken", "logout", {
     expires: new Date(Date.now()),
   });
   res.status(statusCode.OK).json({ msg: "logged out" });

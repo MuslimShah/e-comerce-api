@@ -54,6 +54,7 @@ exports.getAllUsers = async (req, res) => {
 exports.showCurrentUser = (req, res) => {
   //show current login user
   const user = req.user;
+  console.log(user);
   res.status(statusCode.OK).json({ user });
 };
 

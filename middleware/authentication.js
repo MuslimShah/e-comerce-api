@@ -1,22 +1,41 @@
 const jwt = require("jsonwebtoken");
 const { unAuthenticatedError, unAuthorizedError } = require("../errors");
 const User = require("../models/user");
+const Token = require("../models/Token");
 const { isTokenValid } = require("../utils");
+const { attachCookieToResponse } = require("../utils/jwt");
 
 //authenticaton for users --->role 'user'
-const authenticateUser = (req, res, next) => {
-  const token = req.signedCookies.token;
-  if (!token) {
-    throw new unAuthenticatedError("Authentication is Invalid");
-  }
+const authenticateUser = async (req, res, next) => {
+  const { accessToken, refreshToken } = req.signedCookies;
+
   try {
-    const { name, userId, role } = isTokenValid(token);
-    req.user = { name, userId, role };
+    if (accessToken) {
+      const payload = isTokenValid(accessToken);
+      req.user = payload.user;
+      return next();
+    }
+    //now checking for refresh token
+    const payload = isTokenValid(refreshToken);
+    console.log(payload);
+    const existingToken = await Token.findOne({
+      user: payload.user.userId,
+      refreshToken: payload.refreshToken,
+    });
+    console.log(existingToken);
+    if (!existingToken || !existingToken?.isValid) {
+      throw new unAuthenticatedError("Authentication is Invalid");
+    }
+    req.user = payload.user;
+    attachCookieToResponse({
+      res,
+      user: payload.user,
+      refreshToken: existingToken.refreshToken,
+    });
+    next();
   } catch (error) {
     throw new unAuthenticatedError("Authentication is Invalid");
   }
-
-  next();
 };
 
 //authorize permission for admin
