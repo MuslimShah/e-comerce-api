@@ -44,7 +44,12 @@ ORIGIN=http://localhost:3000
 
 Note: Replace dummy_jwt_secret, dummy_cookie_secret, dummy_access_token, dummy_sender_id, and dummy_sender_name with your actual values in a production environment.
 
-3. Start the server:
+3. Install dependencies:
+
+```bash
+npm install
+```
+4. Start the server:
 
 ```bash
 npm start
