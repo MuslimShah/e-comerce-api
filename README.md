@@ -57,3 +57,7 @@ The project uses MailerSend for sending emails. MailerSend provides free email s
 ## Forgot Password and Reset Password
 
 The project includes functionality for forgot password and reset password. Users can request a password reset link if they forget their password, and then reset their password using the link provided in the email.
+
+## Integration with Frontend: API Live and Documentation Available
+
+My API is already live, so you can integrate it with your front end. The URL is [e-comerce-api.cyclic.app](https://e-comerce-api.cyclic.app). For further details, please visit the documentation to get route details.
